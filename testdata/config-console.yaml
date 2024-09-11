@@ -1,0 +1,8 @@
+namespace: console-ns
+disabled: false
+
+transport:
+  type: console
+  console:
+    prettyPrint: true
+

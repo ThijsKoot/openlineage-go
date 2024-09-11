@@ -1,0 +1,10 @@
+namespace: http-ns
+disabled: false
+
+transport:
+  type: http
+
+  http:
+    url: foo
+    endpoint: api/v1/lineage
+    apiKey: bar

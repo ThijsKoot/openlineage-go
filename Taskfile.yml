@@ -1,0 +1,19 @@
+version: '3'
+
+set: [pipefail]
+
+tasks:
+  generate:
+    deps:
+      - install:quicktype
+    cmds:
+      - go run ./internal/generate/...
+
+  install:quicktype:
+    desc: Installs mockgen; a tool to generate mock files
+    vars:
+      QUICKTYPE_VERSION: 15.0.261
+    status:
+      -  test "{{ .QUICKTYPE_VERSION }}" -eq "$(quicktype --version | head -n 1 | awk '{print $3}')"
+    cmds:
+      -  npm install -g "quicktype@{{ .QUICKTYPE_VERSION }}"
