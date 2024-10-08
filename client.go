@@ -3,6 +3,7 @@ package openlineage
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/ThijsKoot/openlineage-go/pkg/transport"
 )
@@ -17,7 +18,7 @@ var DefaultClient, _ = NewClient(ClientConfig{
 })
 
 func NewClient(cfg ClientConfig) (*Client, error) {
-	if cfg.Disabled {
+	if cfg.Disabled || os.Getenv("OPENLINEAGE_DISABLED") != "" {
 		return &Client{
 			disabled: true,
 		}, nil
