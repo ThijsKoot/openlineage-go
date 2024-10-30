@@ -73,7 +73,7 @@ func (r *run) RecordRunFacets(facets ...facets.RunFacet) {
 	event := r.NewEvent(openlineage.EventTypeOther).
 		WithRunFacets(facets...)
 
-	_ = r.client.Emit(context.Background(), event)
+	r.Emit(context.Background(), event)
 }
 
 // RecordFacets implements Run.
@@ -81,7 +81,7 @@ func (r *run) RecordJobFacets(facets ...facets.JobFacet) {
 	event := r.NewEvent(openlineage.EventTypeOther).
 		WithJobFacets(facets...)
 
-	_ = r.client.Emit(context.Background(), event)
+	r.Emit(context.Background(), event)
 }
 
 // RecordInputs implements Run.
@@ -89,7 +89,7 @@ func (r *run) RecordInputs(inputs ...openlineage.InputElement) {
 	event := r.NewEvent(openlineage.EventTypeOther).
 		WithInputs(inputs...)
 
-	_ = r.client.Emit(context.Background(), event)
+	r.Emit(context.Background(), event)
 }
 
 // RecordOutputs implements Run.
@@ -97,7 +97,7 @@ func (r *run) RecordOutputs(outputs ...openlineage.OutputElement) {
 	event := r.NewEvent(openlineage.EventTypeOther).
 		WithOutputs(outputs...)
 
-	_ = r.client.Emit(context.Background(), event)
+	r.Emit(context.Background(), event)
 }
 
 // JobName implements RunContext.
@@ -156,7 +156,9 @@ func (r *run) StartChild(ctx context.Context, jobName string) (context.Context, 
 
 // Emit uses its openlineage.Client to emit an event
 func (r *run) Emit(ctx context.Context, event openlineage.Emittable) {
-	_ = r.client.Emit(ctx, event)
+	go func() {
+		_ = r.client.Emit(ctx, event)
+	}()
 }
 
 func (r *run) RecordError(err error) {
@@ -174,7 +176,7 @@ func (r *run) RecordError(err error) {
 	errorEvent := r.NewEvent(openlineage.EventTypeOther).
 		WithRunFacets(errorFacet)
 
-	_ = r.client.Emit(context.Background(), errorEvent)
+	r.Emit(context.Background(), errorEvent)
 }
 
 func (r *run) Finish() {
@@ -183,7 +185,7 @@ func (r *run) Finish() {
 		eventType = openlineage.EventTypeFail
 	}
 
-	_ = r.client.Emit(context.Background(), r.NewEvent(eventType))
+	r.Emit(context.Background(), r.NewEvent(eventType))
 }
 
 func (r *run) HasFailed() bool {
